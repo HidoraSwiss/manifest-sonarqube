@@ -1,0 +1,48 @@
+type: install
+version: 1.4
+name: SonarQube
+categories: []
+displayName: SonarQube
+homepage: https://github.com/HidoraSwiss/manifest-sonarqube
+logo: https://raw.githubusercontent.com/docker-library/docs/84479f149eb7d748d5dc057665eb96f923e60dc1/sonarqube/logo.png
+ssl: true
+description: |
+  The leading product for Continuous Code Quality
+  
+  https://www.sonarqube.org/
+
+globals:
+  db_user: sonar
+  db_pass: ${fn.password(15)}
+  admin_name: admin
+  admin_pass: ${fn.password(10)}
+
+nodes:
+  - image: sonarqube
+    count: 1
+    cloudlets: 16
+    nodeGroup: cp
+    env:
+     SONARQUBE_JDBC_USERNAME: ${globals.db_user}
+     SONARQUBE_JDBC_PASSWORD: ${globals.db_pass}
+     SONARQUBE_JDBC_URL: jdbc:postgresql://DB:5432/sonar
+    links:
+     - sqldb:DB
+      
+  - image: postgres
+    count: 1
+    cloudlets: 16
+    nodeGroup: sqldb
+    env:
+      POSTGRES_USER: ${globals.db_user}
+      POSTGRES_PASSWORD: ${globals.db_pass}
+
+success: |
+  ## SonarQube is ready
+  
+  **Username**: admin
+  
+  **Password**: admin
+  
+  **URL**: https://${env.domain}
+
